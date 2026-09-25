@@ -7,11 +7,11 @@ export default function Footer() {
 
         <div className="flex flex-col sm:flex-row justify-center gap-6 mt-4 text-sm text-gray-200">
           <p>📧 info@cub1-mosque.org</p>
-          <p>📍 الرياض - حي المسجد الجديد</p>
+          <p>الجزائر -باب الزوار</p>
         </div>
 
         <p className="mt-6 text-xs text-gray-300">
-          جميع الحقوق محفوظة © ٢٠٢٦ • مسجد كيوب ١
+          جميع الحقوق محفوظة © 2026 • مسجد الطلية   CUB1
         </p>
       </div>
     </footer>

@@ -31,7 +31,7 @@ export default function Forme() {
         return { ...prev, years: currentYears.filter((y) => y !== value) }
       }
     })
-  }  space-x-2 space-x-reverse 
+  }  
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -97,7 +97,7 @@ export default function Forme() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* الاسم الأول */}
-            <div className='' >
+            <div  >
               <label className=" block text-md font-semibold text-secondary m-1 text-right">
                 الاسم الأول
               </label>
@@ -232,7 +232,7 @@ export default function Forme() {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              placeholder="مثال : 05 ** ** ** 67"
+              placeholder="مثال : 0501234567"
               className={inputClass}
             />
           </div>
