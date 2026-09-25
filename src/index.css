@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #236b46;
+  --color-secondary: #183329;
+  --color-third: #c79b35;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    min-width: 320px;
+    scroll-behavior: smooth;
+    font-family: 'Tajawal', 'Noto Sans Arabic', sans-serif;
+  }
+
+  body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Tajawal', 'Noto Sans Arabic', sans-serif;
+    background: #f5f7f1;
+    color: var(--color-secondary);
+  }
+
+  input, button { font: inherit; }
+  input { transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease; }
+  input:focus { box-shadow: 0 0 0 4px rgb(35 107 70 / 10%); }
+  button { transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease; }
+  button:hover { transform: translateY(-2px); }
+}
+
+@layer components {
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  [data-animate] > * {
+    opacity: 0;
+    animation: fade-in-up .7s cubic-bezier(.2,.75,.25,1) forwards;
+    will-change: opacity, transform;
+  }
+
+  [data-animate] > :nth-child(1) { animation-delay: .08s; }
+  [data-animate] > :nth-child(2) { animation-delay: .18s; }
+  [data-animate] > :nth-child(3) { animation-delay: .28s; }
+  [data-animate] > :nth-child(4) { animation-delay: .38s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      scroll-behavior: auto !important;
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+    }
+  }
+}
