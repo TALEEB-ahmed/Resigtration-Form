@@ -1,73 +1,67 @@
 import { useState } from 'react'
 
-const fields = [
-  { name: 'firstName', label: 'الاسم الأول', placeholder: 'مثال : محمد' },
-  { name: 'lastName', label: 'الاسم الأخير', placeholder: 'مثال : أحمد' },
-  { name: 'speciality', label: 'التخصص', placeholder: 'مثال : هندسة معمارية  ' },
-  { name: 'university', label: 'الجامعة', placeholder: 'مثال : جامعة هواري بو مدين ' },
-  { name: 'year', label: 'العام الدراسي', placeholder: 'مثال : جامعة هواري بو مدين ' },
-  { name: 'building', label: 'إسم العمارة', placeholder: 'مثال : N' },
-  { name: 'room', label: 'رقم الغرفة', placeholder: 'مثال : 22' },
-  { name: 'phone', label: 'رقم الهاتف', placeholder: 'مثال : 05 ** ** ** 67' },
-]
-
 export default function Forme() {
-  const [formData, setFormData] = useState(
-    fields.reduce((acc, f) => ({ ...acc, [f.name]: '' }), {})
-  )
-  const [errors, setErrors] = useState({})
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    speciality: '',
+    university: 'جامعة هواري بومدين',
+    years: [],
+    building: 'A',
+    room: '',
+    phone: '',
+  })
+
   const [isSuccess, setIsSuccess] = useState(false)
 
+  // للتعامل مع المدخلات العادية والقوائم المنسدلة
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: false }))
   }
 
-const handleSubmit = async (e) => {
-  e.preventDefault()
+  // للتعامل مع خيارات العام الدراسي (Checkbox)
+  const handleCheckboxChange = (e) => {
+    const { value, checked } = e.target
+    setFormData((prev) => {
+      const currentYears = prev.years
+      if (checked) {
+        return { ...prev, years: [...currentYears, value] }
+      } else {
+        return { ...prev, years: currentYears.filter((y) => y !== value) }
+      }
+    })
+  }
 
-  const newErrors = {}
+  const handleSubmit = async (e) => {
+    e.preventDefault()
 
-  fields.forEach((f) => {
-    if (!formData[f.name].trim()) {
-      newErrors[f.name] = true
-    }
-  })
-
-  setErrors(newErrors)
-
-  if (Object.keys(newErrors).length > 0) return
-
-  try {
-    const response = await fetch(
-      'https://sheetdb.io/api/v1/u5nydbyp2687l',
-      {
+    try {
+      await fetch('https://sheetdb.io/api/v1/u5nydbyp2687l', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          data: formData,
+          data: {
+            ...formData,
+            years: formData.years.join(', '), // دمج السنوات المختارة في نص واحد
+          },
         }),
-      }
-    )
+      })
 
-    if (!response.ok) {
-      throw new Error('Failed to submit')
+      setIsSuccess(true)
+    } catch (error) {
+      console.error(error)
     }
-
-    setIsSuccess(true)
-  } catch (error) {
-    console.error(error)
   }
-}
 
-  const inputClass = (hasError) =>
-    `w-full px-4 py-3 border-2 rounded-xl text-right text-base placeholder-gray-400 transition-all duration-200 focus:outline-none ${hasError
-      ? 'border-red-400 focus:border-red-500'
-      : 'border-gray-200 focus:border-primary'
-    }`
+  const inputClass =
+    'w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-right text-base placeholder-gray-500 focus:outline-none focus:border-primary transition-all'
+
+
+  const selectoption =
+    'w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-right text-base placeholder-gray-500 focus:outline-none focus:border-primary transition-all'
 
   if (isSuccess) {
     return (
@@ -92,7 +86,6 @@ const handleSubmit = async (e) => {
           <p className="text-gray-600 mb-6">
             بوركتم ونفع الله بكم. شكراً لمشاركتكم، سيتم التواصل معكم قريباً.
           </p>
-      
         </div>
       </section>
     )
@@ -100,55 +93,148 @@ const handleSubmit = async (e) => {
 
   return (
     <section className="flex justify-center items-center py-12 px-4 bg-gradient-to-b from-primary/5 to-white">
-      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300 p-8 sm:p-10">
-              <form
-                action="https://sheetdb.io/api/v1/u5nydbyp2687l"
-                method='POST'
-              onSubmit={handleSubmit} noValidate className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {fields.slice(0, 2).map((f) => (
-              <div key={f.name}>
-                <label className="block text-sm font-semibold text-secondary mb-2 text-right">
-                  {f.label}
-                </label>
-                <input
-                  type={f.name === 'phone' ? 'tel' : 'text'}
-                  name={f.name}
-                  value={formData[f.name]}
-                  onChange={handleChange}
-                  placeholder={f.placeholder}
-                  className={inputClass(errors[f.name])}
-                />
-                {errors[f.name] && (
-                  <p className="mt-1 text-xs text-red-500 text-right">
-                    هذا الحقل مطلوب
-                  </p>
-                )}
-              </div>
-            ))}
+      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-8 sm:p-10">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* الاسم الأول */}
+            <div className='bg-red-900' >
+              <label className=" block text-md font-semibold text-secondary m-1 text-right">
+                الاسم الأول
+              </label>
+              <input
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                placeholder="مثال : محمد"
+                className={inputClass}
+              />
+            </div>
+
+            {/* الاسم الأخير */}
+            <div>
+              <label className="block text-md font-semibold text-secondary m-1 text-right">
+                الاسم الأخير
+              </label>
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                placeholder="مثال : أحمد"
+                className={inputClass}
+              />
+            </div>
           </div>
 
-          <div className="space-y-6 pt-2">
-            {fields.slice(2).map((f) => (
-              <div key={f.name}>
-                <label className="block text-sm font-semibold text-secondary mb-2 text-right">
-                  {f.label}
-                </label>
-                <input
-                  type={f.name === 'phone' ? 'tel' : 'text'}
-                  name={f.name}
-                  value={formData[f.name]}
-                  onChange={handleChange}
-                  placeholder={f.placeholder}
-                  className={inputClass(errors[f.name])}
-                />
-                {errors[f.name] && (
-                  <p className="mt-1 text-xs text-red-500 text-right">
-                    هذا الحقل مطلوب
-                  </p>
-                )}
-              </div>
-            ))}
+          {/* التخصص */}
+          <div>
+            <label className="block text-md font-semibold text-secondary mb-2 text-right">
+              التخصص
+            </label>
+            <input
+              type="text"
+              name="speciality"
+              value={formData.speciality}
+              onChange={handleChange}
+              placeholder="مثال : هندسة معمارية"
+              className={inputClass}
+            />
+          </div>
+
+          {/* الجامعة - Select */}
+          <div>
+            <label className="block text-md font-semibold text-secondary mb-2 text-right">
+              الجامعة
+            </label>
+            <select
+              name="university"
+              value={formData.university}
+              onChange={handleChange}
+              className={selectoption}
+            >
+           <option value="USTHB">USTHB</option>
+              <option value="ENSTA">ENSTA</option>
+              <option value="ENP">ENP</option>
+              <option value="كلية العلوم الإسلامية في الجزائر">كلية العلوم الإسلامية في الجزائر</option>
+            </select>
+          </div>
+
+          {/* العام الدراسي - Checkbox */}
+          <div>
+            <label className="block text-md font-semibold text-secondary mb-2 text-right">
+              العام الدراسي
+            </label>
+            <div className="flex flex-wrap   gap-4 text-right">
+              {['سنة أولى', 'سنة ثانية', 'سنة ثالثة', 'سنة رابعة', 'سنة خامسة'].map(
+                (yearOption) => (
+                  <label
+                    key={yearOption}
+                    className="flex items-center text-center justify-between gap-3 cursor-pointer bg-gray-50 p-3 rounded-xl border border-gray-100 hover:bg-gray-100"
+                  >
+                    <span className="text-md font-medium text-gray-700">
+                      {yearOption}
+                    </span>
+                    <input
+                      type="checkbox"
+                      value={yearOption}
+                      checked={formData.years.includes(yearOption)}
+                      onChange={handleCheckboxChange}
+                      className="w-4 h-4  text-primary rounded focus:ring-primary"
+                    />
+                  </label>
+                )
+              )}
+            </div>
+          </div>
+
+          {/* اسم العمارة - Select */}
+          <div>
+            <label className="block text-md font-semibold text-secondary mb-2 text-right">
+              إسم العمارة
+            </label>
+            <select
+              name="building"
+              value={formData.building}
+              onChange={handleChange}
+              className={inputClass}
+            >
+              <option value="A">العمارة A</option>
+              <option value="B">العمارة B</option>
+              <option value="C">العمارة C</option>
+              <option value="D">العمارة D</option>
+              <option value="N">العمارة N</option>
+            </select>
+          </div>
+
+          {/* رقم الغرفة */}
+          <div>
+            <label className="block text-md font-semibold text-secondary mb-2 text-right">
+              رقم الغرفة
+            </label>
+            <input
+              type="text"
+              name="room"
+              value={formData.room}
+              onChange={handleChange}
+              placeholder="مثال : 22"
+              className={inputClass}
+            />
+          </div>
+
+          {/* رقم الهاتف */}
+          <div>
+            <label className="block text-md font-semibold text-secondary mb-2 text-right">
+              رقم الهاتف
+            </label>
+            <input
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="مثال : 05 ** ** ** 67"
+              className={inputClass}
+            />
           </div>
 
           <div className="border-r-4 border-third bg-gradient-to-r from-third/5 via-primary/5 to-third/5 rounded-xl p-4">
